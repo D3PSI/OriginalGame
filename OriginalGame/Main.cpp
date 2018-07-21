@@ -38,6 +38,7 @@ const char *TITLE = "Original Game by D3PSI";
 std::ofstream errorLogFile;
 std::ofstream startLogFile;
 std::ofstream eventLogFile;
+double lastFrame = 0.0, deltaTime = 0.0;
 
 /*
 *	Own namespace to prevent any stupid conflicts.
@@ -51,6 +52,8 @@ namespace dev {
 	void processInput(GLFWwindow *window) {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {	// exit when ESCAPE is pressed
 			glfwSetWindowShouldClose(window, true);
+			stopEventLog();
+			stopLog();
 		}
 	}
 
@@ -184,9 +187,9 @@ namespace dev {
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, TITLE, NULL, NULL);
 		if (!window) {
-			dev::showConsoleWindow();
+			showConsoleWindow();
 			std::cerr << "ERROR::GLFW_WINDOW_CREATION::FAILED" << std::endl;
-			dev::error("ERROR::GLFW_WINDOW_CREATION::FAILED");
+			error("ERROR::GLFW_WINDOW_CREATION::FAILED");
 			glfwTerminate();
 			return -1;
 		}
@@ -208,9 +211,9 @@ namespace dev {
 		// capture cursor
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-			dev::showConsoleWindow();
+			showConsoleWindow();
 			std::cerr << "ERROR::GLAD_INITIALIZATION::FAILED" << std::endl;
-			dev::error("ERROR::GLAD_INITIALIZATION::FAILED");
+			error("ERROR::GLAD_INITIALIZATION::FAILED");
 			return -1;
 		}
 		else {
@@ -231,12 +234,31 @@ int main() {
 	dev::startLog();
 	dev::hideConsoleWindow();
 	dev::init();
-	dev::eventLog("Engine initialized successfully");
+	dev::eventLog("Engine successfully initialized");
 
 	/*			GAME LOOP			*/	
 	while (!glfwWindowShouldClose(window)) {
-		// do rendering stuff
+		/*
+		*	// Per-frame time logic
+		*	double currentFrame = glfwGetTime();
+		*	deltaTime = currentFrame - lastFrame;
+		*	lastFrame = currentFrame;
+		*	double fps = 1 / deltaTime;
+		*	std::cout << fps << std::endl;
+		*/
+		dev::processInput(window);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+		glfwPollEvents();
+		glfwSwapBuffers(window);
 	}
+
+	// shut everything down
+	glfwTerminate();
+	dev::stopEventLog();
+	dev::stopLog();
 
 	return 0;
 }
