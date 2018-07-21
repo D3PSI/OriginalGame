@@ -123,6 +123,22 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Shader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\objectShader.frag" />
+    <None Include="src\shaders\objectShader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\icon\icon.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="logs\events.log" />
+    <Text Include="logs\starts.log" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Prototypes.hpp" />
+    <ClInclude Include="Shader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
