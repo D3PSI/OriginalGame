@@ -1,38 +1,32 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define _CRT_SECURE_NO_WARNINGS
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <stbimage/stb_image.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <time.h>
-#include <Windows.h>
-#include <thread>
 #include "Prototypes.hpp"
-#include "Shader.hpp"
 
 /*			GLOBAL VARIABLES	*/
-HWND consoleWindow = GetConsoleWindow();
-GLFWwindow *window = nullptr;
-const int SCR_WIDTH = 1280;
-const int SCR_HEIGHT = 768;
-const char *TITLE = "Aiming Simulator by D3PSI";
-std::ofstream errorLogFile;
-std::ofstream startLogFile;
-std::ofstream eventLogFile;
-double lastFrame = 0.0, deltaTime = 0.0;
-float FOV = 45.0f;
+HWND consoleWindow			= GetConsoleWindow();
+GLFWwindow *window			= nullptr;
+const int SCR_WIDTH			= 1280;
+const int SCR_HEIGHT		= 768;
+const char *TITLE			= "Aiming Simulator by D3PSI";
+double lastFrame			= 0.0, deltaTime = 0.0;
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+glm::vec3 cameraPos			= glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront		= glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp			= glm::vec3(0.0f, 1.0f, 0.0f);
+bool firstMouse				= true;
+float yaw					= -90.0f; 
+float lastX					= SCR_WIDTH / 2.0f;
+float lastY					= SCR_HEIGHT / 2.0f;
 
 /*
 *	Own namespace to prevent any stupid conflicts.
 *	
 */
 namespace dev {
+	std::ofstream errorLogFile;
+	std::ofstream startLogFile;
+	std::ofstream eventLogFile;
+
 	/*
 	*	Processes keyboard input from user.
 	*
@@ -42,6 +36,22 @@ namespace dev {
 			glfwSetWindowShouldClose(window, true);
 			stopEventLog();
 			stopLog();
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			camera.ProcessKeyboard(FORWARD, static_cast<float>(deltaTime));
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			camera.ProcessKeyboard(BACKWARD, static_cast<float>(deltaTime));
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+			camera.ProcessKeyboard(LEFT, static_cast<float>(deltaTime));
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+			camera.ProcessKeyboard(RIGHT, static_cast<float>(deltaTime));
 		}
 	}
 
@@ -58,7 +68,19 @@ namespace dev {
 	*
 	*/
 	void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+		if (firstMouse) {
+			lastX = static_cast<float>(xpos);
+			lastY = static_cast<float>(ypos);
+			firstMouse = false;
+		}
 
+		float xoffset = static_cast<float>(xpos) - lastX;
+		float yoffset = lastY - static_cast<float>(ypos); // reversed since y-coordinates go from bottom to top
+
+		lastX = static_cast<float>(xpos);
+		lastY = static_cast<float>(ypos);
+
+		camera.ProcessMouseMovement(xoffset, yoffset);
 	}
 
 	/*
@@ -66,7 +88,7 @@ namespace dev {
 	*
 	*/
 	void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-
+		camera.ProcessMouseScroll((float)yoffset);
 	}
 
 	/*
@@ -300,7 +322,7 @@ int main() {
 	dev::startEventLog();
 	dev::eventLog("Started execution of main-thread");
 	dev::startLog();
-	dev::hideConsoleWindow();
+	//dev::hideConsoleWindow();
 	dev::init();
 	dev::eventLog("Engine successfully initialized");
 
@@ -393,33 +415,31 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// create transformation-matrix
-		glm::mat4 trans;
-		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		trans = glm::rotate(trans, static_cast<float>(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		glBindVertexArray(VAO);
 		objectShader.use();
 		
 		// create model matrix
-		glm::mat4 model;
-		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		glm::mat4 model = glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		objectShader.setMat4("model", model);
 
 		// create view matrix
-		glm::mat4 view;
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		glm::mat4 view = camera.GetViewMatrix();
+		objectShader.setMat4("view", view);
 
 		// create projection matrix
-		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(FOV), static_cast<float>(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
 		objectShader.setMat4("projection", projection);
-		objectShader.setMat4("model", model);
-		objectShader.setMat4("view", view);
+
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
+
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
 
 	// shut everything down
 	glfwTerminate();

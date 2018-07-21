@@ -13,6 +13,7 @@
 #include <Windows.h>
 #include <thread>
 #include "Shader.hpp"
+#include "Camera.hpp"
 
 /*			PROTOTYPES			*/
 namespace dev {
