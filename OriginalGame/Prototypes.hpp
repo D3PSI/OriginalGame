@@ -11,7 +11,6 @@
 #include <fstream>
 #include <time.h>
 #include <Windows.h>
-#include <thread>
 #include "Shader.hpp"
 #include "Camera.hpp"
 

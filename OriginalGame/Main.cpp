@@ -8,7 +8,7 @@ GLFWwindow *window			= nullptr;
 const int SCR_WIDTH			= 1280;
 const int SCR_HEIGHT		= 768;
 const char *TITLE			= "Aiming Simulator by D3PSI";
-double lastFrame			= 0.0, deltaTime = 0.0;
+float lastFrame			= 0.0, deltaTime = 0.0;
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 glm::vec3 cameraPos			= glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront		= glm::vec3(0.0f, 0.0f, -1.0f);
@@ -32,27 +32,25 @@ namespace dev {
 	*
 	*/
 	void processInput(GLFWwindow *window) {
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {	// exit when ESCAPE is pressed
+		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE)
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
-			stopEventLog();
-			stopLog();
-		}
 
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			camera.ProcessKeyboard(FORWARD, static_cast<float>(deltaTime));
-		}
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			camera.ProcessKeyboard(FORWARD, deltaTime);
 
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-			camera.ProcessKeyboard(BACKWARD, static_cast<float>(deltaTime));
-		}
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			camera.ProcessKeyboard(BACKWARD, deltaTime);
 
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-			camera.ProcessKeyboard(LEFT, static_cast<float>(deltaTime));
-		}
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			camera.ProcessKeyboard(LEFT, deltaTime);
 
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-			camera.ProcessKeyboard(RIGHT, static_cast<float>(deltaTime));
-		}
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			camera.ProcessKeyboard(RIGHT, deltaTime);
 	}
 
 	/*
@@ -334,63 +332,63 @@ int main() {
 
 	/*			BUFFERS				*/
 	float vertices[] = {
-	   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,
-		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
-	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,
-	   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f,  1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f,  1.0f,
-	   -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,
-	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	   -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-	   -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
-	   -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
-	   -0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
-	   -0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
-	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
-	   -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
+	   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	   -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
-		0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-	   -0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
-		0.5f, -0.5f, -0.5f,  1.0f,  1.0f,
-		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,
-	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
-	   -0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
-	   -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,
-	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f
+	   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	   -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
-	unsigned int VAO, VBO;
-
-	// vertex array buffer
+	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+
 	glBindVertexArray(VAO);
 
-	// vertex buffer object
-	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// vertex attribute pointers
+	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	// texture coord attribute
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	
@@ -402,35 +400,37 @@ int main() {
 
 	/*			GAME LOOP			*/	
 	while (!glfwWindowShouldClose(window)) {
-		/*
-		*	// Per-frame time logic
-		*	double currentFrame = glfwGetTime();
-		*	deltaTime = currentFrame - lastFrame;
-		*	lastFrame = currentFrame;
-		*	double fps = 1 / deltaTime;
-		*	std::cout << fps << std::endl;
-		*/
+		// Per-frame time logic
+		double currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		//double fps = 1 / deltaTime;
+		//std::cout << fps << std::endl;
+		
 		dev::processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// create transformation-matrix
-
-		glBindVertexArray(VAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);
 		objectShader.use();
 		
 		// create model matrix
-		glm::mat4 model = glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		glm::mat4 model;
+		model = glm::translate(model, glm::vec3(0.5f, 1.0f, 0.0f));
 		objectShader.setMat4("model", model);
 
 		// create view matrix
-		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 view;
+		view = camera.GetViewMatrix();
 		objectShader.setMat4("view", view);
 
 		// create projection matrix
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
+		glm::mat4 projection;
+		projection = glm::perspective(glm::radians(camera.Zoom), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
 		objectShader.setMat4("projection", projection);
 
+		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 

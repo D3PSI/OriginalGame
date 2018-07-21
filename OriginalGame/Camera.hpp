@@ -3,6 +3,7 @@
 #include <glm/glm.hpp> 
 #include <glm/gtc/matrix_transform.hpp> 
 #include <vector> 
+#include <iostream>
 
 /*
 *	Defines several possible options for camera movement. Used as abstraction to stay 
@@ -21,7 +22,6 @@ const float PITCH = 0.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.15f;
 const float ZOOM = 45.0f;
-
 
 /*
 *	An abstract camera class that processes input and calculates the corresponding Euler Angles,  
@@ -49,6 +49,6 @@ public:
 	void ProcessMouseScroll(float yoffset);
 
 private:
-	void updateCameraVectors(void);
+	void updateCameraVectors();
 };
 
