@@ -29,6 +29,7 @@ namespace dev {
 	void stopEventLog(void); 
 	void showConsoleWindow(void);
 	void hideConsoleWindow(void); 
-	void renderTriangle(void);
+	unsigned int loadTexture(char const *path);
+	unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma);
 	const std::string currentDateTime(void);
 }

@@ -37,6 +37,7 @@
   <ItemGroup>
     <Text Include="logs\events.log" />
     <Text Include="logs\starts.log" />
+    <Text Include="logs\errorLog.log" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.hpp">

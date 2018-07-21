@@ -21,11 +21,12 @@ HWND consoleWindow = GetConsoleWindow();
 GLFWwindow *window = nullptr;
 const int SCR_WIDTH = 1280;
 const int SCR_HEIGHT = 768;
-const char *TITLE = "Original Game by D3PSI";
+const char *TITLE = "Aiming Simulator by D3PSI";
 std::ofstream errorLogFile;
 std::ofstream startLogFile;
 std::ofstream eventLogFile;
 double lastFrame = 0.0, deltaTime = 0.0;
+float FOV = 45.0f;
 
 /*
 *	Own namespace to prevent any stupid conflicts.
@@ -161,6 +162,86 @@ namespace dev {
 	}
 
 	/*
+	*	Utility function for loading a texture from a file.
+	*
+	*/
+	unsigned int loadTexture(char const *path) {
+		unsigned int textureID;
+		glGenTextures(1, &textureID);
+
+		int width, height, nrComponents;
+		unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+		if (data) {
+			GLenum format;
+			if (nrComponents == 1) {
+				format = GL_RED;
+			}
+			else if (nrComponents == 3) {
+				format = GL_RGB;
+			}
+			else if (nrComponents == 4) {
+				format = GL_RGBA;
+			}
+			glBindTexture(GL_TEXTURE_2D, textureID);
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			stbi_image_free(data);
+		}
+		else {
+			showConsoleWindow();
+			std::cerr << "Texture failed to load at path: " << path << std::endl;
+			error("Texture failed to load at path: " + *path);
+			stbi_image_free(data);
+		}
+
+		return textureID;
+	}
+
+	/*
+	*	Utility function for loading a texture from a file.
+	*
+	*/
+	unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma) {
+		std::string filename = std::string(path);
+		filename = directory + '/' + filename;
+		unsigned int textureID;
+		glGenTextures(1, &textureID);
+		int width, height, nrComponents;
+		unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+		if (data) {
+			GLenum format;
+			if (nrComponents == 1) {
+				format = GL_RED;
+			}
+			else if (nrComponents == 3) {
+				format = GL_RGB;
+			}
+			else if (nrComponents == 4) {
+				format = GL_RGBA;
+			}
+			glBindTexture(GL_TEXTURE_2D, textureID);
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			stbi_image_free(data);
+		}
+		else {
+			showConsoleWindow();
+			std::cerr << "Texture failed to load at path: " << path << std::endl;
+			error("Texture failed to load at path: " + *path);
+			stbi_image_free(data);
+		}
+		return textureID;
+	}
+
+	/*
 	*	Handles main initialization of GLFW and OpenGL.
 	*
 	*/
@@ -226,23 +307,76 @@ int main() {
 	/*			SHADERS				*/
 	Shader objectShader("src/shaders/objectShader.vert", "src/shaders/objectShader.frag");
 
+	/*			TEXTURES			*/	
+	unsigned int texture1 = dev::loadTexture("res/textures/test.png");
+
 	/*			BUFFERS				*/
 	float vertices[] = {
-		// positions         // colors
-		0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
-	   -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
-		0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
+	   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
+	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,
+
+	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  1.0f,
+	   -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
+
+	   -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
+	   -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
+	   -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
+
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
+
+	   -0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f,  1.0f,
+
+	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f,  1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,
+	   -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,
+	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f
 	};
+
 	unsigned int VAO, VBO;
+
+	// vertex array buffer
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
+
+	// vertex buffer object
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+
+	// vertex attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	
+	objectShader.use();
+	objectShader.setInt("texture1", 0);
+
+	/*			OPENGL SETTINGS		*/
+	glEnable(GL_DEPTH_TEST);
 
 	/*			GAME LOOP			*/	
 	while (!glfwWindowShouldClose(window)) {
@@ -258,9 +392,29 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// create transformation-matrix
+		glm::mat4 trans;
+		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+		trans = glm::rotate(trans, static_cast<float>(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
+
 		glBindVertexArray(VAO);
 		objectShader.use();
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		
+		// create model matrix
+		glm::mat4 model;
+		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+
+		// create view matrix
+		glm::mat4 view;
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+		// create projection matrix
+		glm::mat4 projection;
+		projection = glm::perspective(glm::radians(FOV), static_cast<float>(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
+		objectShader.setMat4("projection", projection);
+		objectShader.setMat4("model", model);
+		objectShader.setMat4("view", view);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 
 		glfwPollEvents();
