@@ -125,6 +125,8 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +143,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="Mesh.hpp" />
+    <ClInclude Include="Model.hpp" />
     <ClInclude Include="Prototypes.hpp" />
     <ClInclude Include="Shader.hpp" />
   </ItemGroup>

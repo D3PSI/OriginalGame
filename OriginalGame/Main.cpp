@@ -139,7 +139,12 @@ namespace dev {
 		struct tm tstruct;
 		char buf[80];
 		tstruct = *localtime(&now);
-		strftime(buf, sizeof(buf), "%d-%m-%Y %X", &tstruct);
+		strftime(
+			buf,
+			sizeof(buf),
+			"%d-%m-%Y %X",
+			&tstruct
+		);
 		return buf;
 	}
 
@@ -190,7 +195,13 @@ namespace dev {
 		glGenTextures(1, &textureID);
 
 		int width, height, nrComponents;
-		unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+		unsigned char *data = stbi_load(
+									path, 
+									&width, 
+									&height,
+									&nrComponents,
+									0
+								);
 		if (data) {
 			GLenum format;
 			if (nrComponents == 1) {
@@ -203,12 +214,38 @@ namespace dev {
 				format = GL_RGBA;
 			}
 			glBindTexture(GL_TEXTURE_2D, textureID);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			glTexImage2D(
+				GL_TEXTURE_2D, 
+				0, 
+				format, 
+				width, 
+				height, 
+				0, 
+				format, 
+				GL_UNSIGNED_BYTE, 
+				data
+			);
 			glGenerateMipmap(GL_TEXTURE_2D);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(
+				GL_TEXTURE_2D,
+				GL_TEXTURE_WRAP_S, 
+				GL_REPEAT
+			);
+			glTexParameteri(
+				GL_TEXTURE_2D,
+				GL_TEXTURE_WRAP_T,
+				GL_REPEAT
+			);
+			glTexParameteri(
+				GL_TEXTURE_2D, 
+				GL_TEXTURE_MIN_FILTER,
+				GL_LINEAR_MIPMAP_LINEAR
+			);
+			glTexParameteri(
+				GL_TEXTURE_2D,
+				GL_TEXTURE_MAG_FILTER,
+				GL_LINEAR
+			);
 			stbi_image_free(data);
 		}
 		else {
@@ -231,7 +268,13 @@ namespace dev {
 		unsigned int textureID;
 		glGenTextures(1, &textureID);
 		int width, height, nrComponents;
-		unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+		unsigned char *data = stbi_load(
+									filename.c_str(),
+									&width,
+									&height,
+									&nrComponents,
+									0
+								);
 		if (data) {
 			GLenum format;
 			if (nrComponents == 1) {
@@ -244,12 +287,38 @@ namespace dev {
 				format = GL_RGBA;
 			}
 			glBindTexture(GL_TEXTURE_2D, textureID);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0, 
+				format,
+				width,
+				height,
+				0, 
+				format,
+				GL_UNSIGNED_BYTE,
+				data
+			);
 			glGenerateMipmap(GL_TEXTURE_2D);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(
+				GL_TEXTURE_2D,
+				GL_TEXTURE_WRAP_S,
+				GL_REPEAT
+			);
+			glTexParameteri(
+				GL_TEXTURE_2D, 
+				GL_TEXTURE_WRAP_T, 
+				GL_REPEAT
+			);
+			glTexParameteri(
+				GL_TEXTURE_2D,
+				GL_TEXTURE_MIN_FILTER,
+				GL_LINEAR_MIPMAP_LINEAR
+			);
+			glTexParameteri(
+				GL_TEXTURE_2D, 
+				GL_TEXTURE_MAG_FILTER,
+				GL_LINEAR
+			);
 			stbi_image_free(data);
 		}
 		else {
@@ -273,7 +342,12 @@ namespace dev {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, TITLE, NULL, NULL);
+		window = glfwCreateWindow(
+							SCR_WIDTH, 
+							SCR_HEIGHT,
+							TITLE, NULL,
+							NULL
+						);
 		if (!window) {
 			showConsoleWindow();
 			std::cerr << "ERROR::GLFW_WINDOW_CREATION::FAILED" << std::endl;
@@ -283,8 +357,13 @@ namespace dev {
 		}
 
 		// create icon
-		icon[0].pixels = stbi_load("res/icon/icon.jpg", &icon[0].width,
-			&icon[0].height, 0, 4);
+		icon[0].pixels = stbi_load(
+							"res/icon/icon.jpg",
+							&icon[0].width,
+							&icon[0].height,
+							0, 
+							4
+						);
 		glfwSetWindowIcon(window, 1, icon);
 		stbi_image_free(icon[0].pixels);
 
@@ -382,14 +461,33 @@ int main() {
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(
+		GL_ARRAY_BUFFER, 
+		sizeof(vertices),
+		vertices,
+		GL_STATIC_DRAW
+	);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(
+		0, 
+		3,
+		GL_FLOAT, 
+		GL_FALSE,
+		5 * sizeof(float),
+		(void*)0
+	);
 	glEnableVertexAttribArray(0);
 
 	// texture coord attribute
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(
+		1, 
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		5 * sizeof(float),
+		(void*)(3 * sizeof(float))
+	);
 	glEnableVertexAttribArray(1);
 	
 	objectShader.use();
@@ -401,7 +499,7 @@ int main() {
 	/*			GAME LOOP			*/	
 	while (!glfwWindowShouldClose(window)) {
 		// Per-frame time logic
-		double currentFrame = glfwGetTime();
+		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		//double fps = 1 / deltaTime;
@@ -427,11 +525,20 @@ int main() {
 
 		// create projection matrix
 		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(camera.Zoom), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
+		projection = glm::perspective(
+								glm::radians(camera.Zoom),
+								static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 
+								0.1f,
+								100.0f
+							);
 		objectShader.setMat4("projection", projection);
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArrays(
+			GL_TRIANGLES,
+			0,
+			36
+		);
 		glBindVertexArray(0);
 
 		glfwPollEvents();
