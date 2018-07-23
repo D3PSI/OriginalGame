@@ -6,10 +6,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <map>
 #include <vector>
 #include "Mesh.hpp"
 #include "Shader.hpp"
