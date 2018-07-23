@@ -1,6 +1,5 @@
 #include "Mesh.hpp"
 
-
 /*
 *	Constructor.
 *	
@@ -25,10 +24,10 @@ void Mesh::draw(Shader shader) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		std::string number;
 		std::string name = textures[i].type;
-		if (name == "texture_diffuse") {
+		if (name == "material.texture_diffuse") {
 			number = std::to_string(diffuseNr++);
 		}
-		else if (name == "texture_specular") {
+		else if (name == "material.texture_specular") {
 			number = std::to_string(specularNr++);
 		}
 		else if (name == "texture_normal") {
@@ -40,6 +39,10 @@ void Mesh::draw(Shader shader) {
 		glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].ID);
 	}
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
 }
 
 /*

@@ -1,12 +1,12 @@
 #include "Model.hpp"
 
-
 /*
 *	Constructor, expects filepath to a 3D-model.
 *	
 */
 Model::Model(std::string const &path, bool gamma) : gammaCorrection(gamma) {
 	loadModel(path);
+	dev::eventLog("Model loaded successfully");
 }
 
 /*
@@ -99,71 +99,71 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 		vector.y = mesh->mBitangents[i].y;
 		vector.z = mesh->mBitangents[i].z;
 		vertex.bitangent = vector;
-		
+
 		vertices.push_back(vertex);
+	}
 
-		for (unsigned int j = 0; j < mesh->mNumFaces; j++) {
-			aiFace face = mesh->mFaces[j];
-			for (unsigned int k = 0; k < face.mNumIndices; k++) {
-				indices.push_back(face.mIndices[k]);
-			}
+	for (unsigned int j = 0; j < mesh->mNumFaces; j++) {
+		aiFace face = mesh->mFaces[j];
+		for (unsigned int k = 0; k < face.mNumIndices; k++) {
+			indices.push_back(face.mIndices[k]);
 		}
+	}
 
-		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+	aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-		// diffuse maps
-		std::vector<Texture> diffuseMaps = loadMaterialTextures(
-			material, 
-			aiTextureType_DIFFUSE, 
-			"texture_diffuse"
-		);
-		textures.insert(
-			textures.end(),
-			diffuseMaps.begin(),
-			diffuseMaps.end()
-		);
+	// diffuse maps
+	std::vector<Texture> diffuseMaps = loadMaterialTextures(
+		material, 
+		aiTextureType_DIFFUSE, 
+		"texture_diffuse"
+	);
+	textures.insert(
+		textures.end(),
+		diffuseMaps.begin(),
+		diffuseMaps.end()
+	);
 
-		// specular maps
-		std::vector<Texture> specularMaps = loadMaterialTextures(
-			material, 
-			aiTextureType_SPECULAR, 
-			"texture_specular"
-		);
-		textures.insert(
-			textures.end(), 
-			specularMaps.begin(),
-			specularMaps.end()
-		);
+	// specular maps
+	std::vector<Texture> specularMaps = loadMaterialTextures(
+		material, 
+		aiTextureType_SPECULAR, 
+		"texture_specular"
+	);
+	textures.insert(
+		textures.end(), 
+		specularMaps.begin(),
+		specularMaps.end()
+	);
 
-		// normal maps
-		std::vector<Texture> normalMaps = loadMaterialTextures(
-			material, 
-			aiTextureType_AMBIENT, 
-			"texture_normal"
-		);
-		textures.insert(
-			textures.end(),
-			normalMaps.begin(),
-			normalMaps.end()
-		);
+	// normal maps
+	std::vector<Texture> normalMaps = loadMaterialTextures(
+		material, 
+		aiTextureType_AMBIENT, 
+		"texture_normal"
+	);
+	textures.insert(
+		textures.end(),
+		normalMaps.begin(),
+		normalMaps.end()
+	);
 
 		// height maps
-		std::vector<Texture> heighMaps = loadMaterialTextures(
-			material, 
-			aiTextureType_HEIGHT, 
-			"texture_height"
-		);
-		textures.insert(
-			textures.end(), 
-			heighMaps.begin(),
-			heighMaps.end()
-		);
-		return Mesh(
-			vertices,
-			indices,
-			textures
-		);
-	}
+	std::vector<Texture> heighMaps = loadMaterialTextures(
+		material, 
+		aiTextureType_HEIGHT, 
+		"texture_height"
+	);
+	textures.insert(
+		textures.end(), 
+		heighMaps.begin(),
+		heighMaps.end()
+	);
+	return Mesh(
+		vertices,
+		indices,
+		textures
+	);
 }
 
 /*
@@ -195,8 +195,8 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *material, aiTexture
 			textures.push_back(texture);
 			textures_loaded.push_back(texture);
 		}
-		return textures;
 	}
+	return textures;
 }
 
 /*

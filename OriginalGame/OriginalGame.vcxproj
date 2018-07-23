@@ -130,16 +130,37 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\models\nanosuit\nanosuit.blend" />
+    <None Include="res\models\nanosuit\nanosuit.mtl" />
     <None Include="src\shaders\objectShader.frag" />
     <None Include="src\shaders\objectShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\icon\icon.jpg" />
+    <Image Include="res\models\nanosuit\arm_dif.png" />
+    <Image Include="res\models\nanosuit\arm_showroom_ddn.png" />
+    <Image Include="res\models\nanosuit\arm_showroom_spec.png" />
+    <Image Include="res\models\nanosuit\body_dif.png" />
+    <Image Include="res\models\nanosuit\body_showroom_ddn.png" />
+    <Image Include="res\models\nanosuit\body_showroom_spec.png" />
+    <Image Include="res\models\nanosuit\glass_ddn.png" />
+    <Image Include="res\models\nanosuit\glass_dif.png" />
+    <Image Include="res\models\nanosuit\hand_dif.png" />
+    <Image Include="res\models\nanosuit\hand_showroom_ddn.png" />
+    <Image Include="res\models\nanosuit\hand_showroom_spec.png" />
+    <Image Include="res\models\nanosuit\helmet_diff.png" />
+    <Image Include="res\models\nanosuit\helmet_showroom_ddn.png" />
+    <Image Include="res\models\nanosuit\helmet_showroom_spec.png" />
+    <Image Include="res\models\nanosuit\leg_dif.png" />
+    <Image Include="res\models\nanosuit\leg_showroom_ddn.png" />
+    <Image Include="res\models\nanosuit\leg_showroom_spec.png" />
+    <Image Include="res\textures\test.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="logs\errorLog.log" />
     <Text Include="logs\events.log" />
     <Text Include="logs\starts.log" />
+    <Text Include="res\models\nanosuit\LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />

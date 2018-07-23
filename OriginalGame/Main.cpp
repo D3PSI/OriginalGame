@@ -1,5 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define _CRT_SECURE_NO_WARNINGS
+#include "Model.hpp"
 #include "Prototypes.hpp"
 
 /*			GLOBAL VARIABLES	*/
@@ -8,15 +9,37 @@ GLFWwindow *window			= nullptr;
 const int SCR_WIDTH			= 1280;
 const int SCR_HEIGHT		= 768;
 const char *TITLE			= "Aiming Simulator by D3PSI";
-float lastFrame			= 0.0, deltaTime = 0.0;
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-glm::vec3 cameraPos			= glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront		= glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp			= glm::vec3(0.0f, 1.0f, 0.0f);
+float lastFrame				= 0.0;
+float deltaTime				= 0.0;
+Camera camera(glm::vec3(
+					0.0f,
+					0.0f,
+					3.0f
+				));
+glm::vec3 cameraPos			= glm::vec3(
+									0.0f,
+									0.0f, 
+									3.0f
+								);
+glm::vec3 cameraFront		= glm::vec3(
+									0.0f,
+									0.0f,
+								   -1.0f
+								);
+glm::vec3 cameraUp			= glm::vec3(
+									0.0f,
+									1.0f,
+									0.0f
+								);
 bool firstMouse				= true;
 float yaw					= -90.0f; 
 float lastX					= SCR_WIDTH / 2.0f;
 float lastY					= SCR_HEIGHT / 2.0f;
+glm::vec3 lightPos(
+			-0.7f,
+			-0.2f,
+			-2.0f
+		);
 
 /*
 *	Own namespace to prevent any stupid conflicts.
@@ -406,95 +429,12 @@ int main() {
 	/*			SHADERS				*/
 	Shader objectShader("src/shaders/objectShader.vert", "src/shaders/objectShader.frag");
 
-	/*			TEXTURES			*/	
-	unsigned int texture1 = dev::loadTexture("res/textures/test.png");
-
-	/*			BUFFERS				*/
-	float vertices[] = {
-	   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	   -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-	   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	   -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-	   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	   -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-	   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};
-
-	unsigned int VBO, VAO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(
-		GL_ARRAY_BUFFER, 
-		sizeof(vertices),
-		vertices,
-		GL_STATIC_DRAW
-	);
-
-	// position attribute
-	glVertexAttribPointer(
-		0, 
-		3,
-		GL_FLOAT, 
-		GL_FALSE,
-		5 * sizeof(float),
-		(void*)0
-	);
-	glEnableVertexAttribArray(0);
-
-	// texture coord attribute
-	glVertexAttribPointer(
-		1, 
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		5 * sizeof(float),
-		(void*)(3 * sizeof(float))
-	);
-	glEnableVertexAttribArray(1);
-	
-	objectShader.use();
-	objectShader.setInt("texture1", 0);
+	/*			MODELS				*/
+	Model target("res/models/nanosuit/nanosuit.obj");
 
 	/*			OPENGL SETTINGS		*/
 	glEnable(GL_DEPTH_TEST);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	/*			GAME LOOP			*/	
 	while (!glfwWindowShouldClose(window)) {
@@ -506,17 +446,42 @@ int main() {
 		//std::cout << fps << std::endl;
 		
 		dev::processInput(window);
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(
+			0.2f,
+			0.3f,
+			0.3f,
+			1.0f
+		);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
 		objectShader.use();
-		
-		// create model matrix
-		glm::mat4 model;
-		model = glm::translate(model, glm::vec3(0.5f, 1.0f, 0.0f));
-		objectShader.setMat4("model", model);
+
+		// set uniforms
+		objectShader.setVec3("viewPos", camera.Position);
+
+		glm::vec3 lightColor = glm::vec3(
+			1.0f,
+			1.0f,
+			1.0f
+		);
+		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+		//objectShader.setVec3("light.position", lightPos); 
+		objectShader.setVec3("light.direction", lightPos);
+
+		objectShader.setVec3("light.ambient", ambientColor);
+		objectShader.setVec3("light.diffuse", diffuseColor);
+		objectShader.setVec3(
+			"light.specular",
+			1.0f,
+			1.0f,
+			1.0f
+		);
+		objectShader.setFloat("material.shininess", 32.0f);
+
+		objectShader.setFloat("light.constant", 1.0f);
+		objectShader.setFloat("light.linear", 1.0f);
+		objectShader.setFloat("light.quadratic", 1.0f);
 
 		// create view matrix
 		glm::mat4 view;
@@ -532,21 +497,23 @@ int main() {
 								100.0f
 							);
 		objectShader.setMat4("projection", projection);
-
-		glBindVertexArray(VAO);
-		glDrawArrays(
-			GL_TRIANGLES,
-			0,
-			36
-		);
-		glBindVertexArray(0);
+		glm::mat4 model;
+		model = glm::translate(model, glm::vec3(
+			0.0f,
+		   -1.75f,
+			0.0f
+		));
+		model = glm::scale(model, glm::vec3(
+			0.2f, 
+			0.2f,
+			0.2f
+		));  
+		objectShader.setMat4("model", model);
+		target.draw(objectShader);
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
-
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
 
 	// shut everything down
 	glfwTerminate();
