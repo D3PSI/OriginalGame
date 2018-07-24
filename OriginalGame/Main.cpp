@@ -615,15 +615,7 @@ int main() {
 		skybox.bindTexture();
 		skybox.draw();
 		glBindVertexArray(0);
-		glDepthFunc(GL_LESS);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		framebuffer.useShader();
-		framebuffer.bindScreenQuadVAO();
-		glDisable(GL_DEPTH_TEST);
-		framebuffer.bindTexture();
 		framebuffer.draw();
 
 		glfwPollEvents();

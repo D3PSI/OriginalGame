@@ -188,7 +188,7 @@ void Framebuffer::bindScreenQuadVAO() {
 *
 */
 void Framebuffer::bindScreenQuadVBO() {
-	glBindVertexArray(screenQuadVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, screenQuadVBO);
 }
 
 /*
@@ -197,6 +197,8 @@ void Framebuffer::bindScreenQuadVBO() {
 */
 void Framebuffer::createScreenShader(const char *vertPath, const char *fragPath, const char *geomPath) {
 	screenShader = new Shader(vertPath, fragPath, geomPath);
+	useShader();
+	screenShader->setInt("screenTexture", 0);
 }
 
 /*
@@ -212,6 +214,13 @@ void Framebuffer::useShader() {
 *	
 */
 void Framebuffer::draw() {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	useShader();
+	bindScreenQuadVAO();
+	bindTexture();
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
