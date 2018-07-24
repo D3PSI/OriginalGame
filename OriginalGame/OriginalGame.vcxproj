@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -135,6 +136,8 @@
     <None Include="res\models\nanosuit\nanosuit.mtl" />
     <None Include="src\shaders\objectShader.frag" />
     <None Include="src\shaders\objectShader.vert" />
+    <None Include="src\shaders\screenShader.frag" />
+    <None Include="src\shaders\screenShader.vert" />
     <None Include="src\shaders\skyboxShader.frag" />
     <None Include="src\shaders\skyboxShader.vert" />
   </ItemGroup>
@@ -173,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="Framebuffer.hpp" />
     <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="Model.hpp" />
     <ClInclude Include="Prototypes.hpp" />

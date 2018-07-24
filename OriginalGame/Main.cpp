@@ -2,6 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Model.hpp"
 #include "Skybox.hpp"
+#include "Framebuffer.hpp"
 #include "Prototypes.hpp"
 
 /*			GLOBAL VARIABLES	*/
@@ -243,36 +244,36 @@ namespace dev {
 			}
 			glBindTexture(GL_TEXTURE_2D, textureID);
 			glTexImage2D(
-				GL_TEXTURE_2D, 
-				0, 
-				format, 
-				width, 
-				height, 
-				0, 
-				format, 
-				GL_UNSIGNED_BYTE, 
-				data
+					GL_TEXTURE_2D, 
+					0, 
+					format, 
+					width, 
+					height, 
+					0, 
+					format, 
+					GL_UNSIGNED_BYTE, 
+					data
 			);
 			glGenerateMipmap(GL_TEXTURE_2D);
 			glTexParameteri(
-				GL_TEXTURE_2D,
-				GL_TEXTURE_WRAP_S, 
-				GL_REPEAT
+					GL_TEXTURE_2D,
+					GL_TEXTURE_WRAP_S, 
+					GL_REPEAT
 			);
 			glTexParameteri(
-				GL_TEXTURE_2D,
-				GL_TEXTURE_WRAP_T,
-				GL_REPEAT
+					GL_TEXTURE_2D,
+					GL_TEXTURE_WRAP_T,
+					GL_REPEAT
 			);
 			glTexParameteri(
-				GL_TEXTURE_2D, 
-				GL_TEXTURE_MIN_FILTER,
-				GL_LINEAR_MIPMAP_LINEAR
+					GL_TEXTURE_2D, 
+					GL_TEXTURE_MIN_FILTER,
+					GL_LINEAR_MIPMAP_LINEAR
 			);
 			glTexParameteri(
-				GL_TEXTURE_2D,
-				GL_TEXTURE_MAG_FILTER,
-				GL_LINEAR
+					GL_TEXTURE_2D,
+					GL_TEXTURE_MAG_FILTER,
+					GL_LINEAR
 			);
 			stbi_image_free(data);
 		}
@@ -316,36 +317,36 @@ namespace dev {
 			}
 			glBindTexture(GL_TEXTURE_2D, textureID);
 			glTexImage2D(
-				GL_TEXTURE_2D,
-				0, 
-				format,
-				width,
-				height,
-				0, 
-				format,
-				GL_UNSIGNED_BYTE,
-				data
+					GL_TEXTURE_2D,
+					0, 
+					format,
+					width,
+					height,
+					0, 
+					format,
+					GL_UNSIGNED_BYTE,
+					data
 			);
 			glGenerateMipmap(GL_TEXTURE_2D);
 			glTexParameteri(
-				GL_TEXTURE_2D,
-				GL_TEXTURE_WRAP_S,
-				GL_REPEAT
+					GL_TEXTURE_2D,
+					GL_TEXTURE_WRAP_S,
+					GL_REPEAT
 			);
 			glTexParameteri(
-				GL_TEXTURE_2D, 
-				GL_TEXTURE_WRAP_T, 
-				GL_REPEAT
+					GL_TEXTURE_2D, 
+					GL_TEXTURE_WRAP_T, 
+					GL_REPEAT
 			);
 			glTexParameteri(
-				GL_TEXTURE_2D,
-				GL_TEXTURE_MIN_FILTER,
-				GL_LINEAR_MIPMAP_LINEAR
+					GL_TEXTURE_2D,
+					GL_TEXTURE_MIN_FILTER,
+					GL_LINEAR_MIPMAP_LINEAR
 			);
 			glTexParameteri(
-				GL_TEXTURE_2D, 
-				GL_TEXTURE_MAG_FILTER,
-				GL_LINEAR
+					GL_TEXTURE_2D, 
+					GL_TEXTURE_MAG_FILTER,
+					GL_LINEAR
 			);
 			stbi_image_free(data);
 		}
@@ -378,15 +379,15 @@ namespace dev {
 									);
 			if (data) {
 				glTexImage2D(
-					GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-					0, 
-					GL_RGB, 
-					width,
-					height,
-					0,
-					GL_RGB, 
-					GL_UNSIGNED_BYTE, 
-					data
+						GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+						0, 
+						GL_RGB, 
+						width,
+						height,
+						0,
+						GL_RGB, 
+						GL_UNSIGNED_BYTE, 
+						data
 				);
 				stbi_image_free(data);
 			}
@@ -398,29 +399,29 @@ namespace dev {
 			}
 		}
 		glTexParameteri(
-			GL_TEXTURE_CUBE_MAP,
-			GL_TEXTURE_MIN_FILTER,
-			GL_LINEAR
+				GL_TEXTURE_CUBE_MAP,
+				GL_TEXTURE_MIN_FILTER,
+				GL_LINEAR
 		);
 		glTexParameteri(
-			GL_TEXTURE_CUBE_MAP,
-			GL_TEXTURE_MAG_FILTER, 
-			GL_LINEAR
-		);
-		glTexParameteri
-		(GL_TEXTURE_CUBE_MAP,
-			GL_TEXTURE_WRAP_S,
-			GL_CLAMP_TO_EDGE
+				GL_TEXTURE_CUBE_MAP,
+				GL_TEXTURE_MAG_FILTER, 
+				GL_LINEAR
 		);
 		glTexParameteri(
-			GL_TEXTURE_CUBE_MAP,
-			GL_TEXTURE_WRAP_T,
-			GL_CLAMP_TO_EDGE
+				GL_TEXTURE_CUBE_MAP,
+				GL_TEXTURE_WRAP_S,
+				GL_CLAMP_TO_EDGE
 		);
 		glTexParameteri(
-			GL_TEXTURE_CUBE_MAP,
-			GL_TEXTURE_WRAP_R,
-			GL_CLAMP_TO_EDGE
+				GL_TEXTURE_CUBE_MAP,
+				GL_TEXTURE_WRAP_T,
+				GL_CLAMP_TO_EDGE
+		);
+		glTexParameteri(
+				GL_TEXTURE_CUBE_MAP,
+				GL_TEXTURE_WRAP_R,
+				GL_CLAMP_TO_EDGE
 		);
 		return textureID;
 	}
@@ -498,6 +499,14 @@ int main() {
 	dev::init();
 	dev::eventLog("Engine successfully initialized");
 
+	/*			BUFFERS				*/
+	Framebuffer framebuffer(
+					SCR_WIDTH, 
+					SCR_HEIGHT,
+					"src/shaders/screenShader.vert", 
+					"src/shaders/screenShader.frag"
+	);
+
 	/*			SHADERS				*/
 	Shader objectShader("src/shaders/objectShader.vert", "src/shaders/objectShader.frag");
 
@@ -524,6 +533,10 @@ int main() {
 		//std::cout << fps << std::endl;
 		
 		dev::processInput(window);
+
+		framebuffer.bindFBO();
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 		glClearColor(
 			0.2f,
 			0.3f,
@@ -536,19 +549,19 @@ int main() {
 		// set uniforms
 		objectShader.setVec3("viewPos", camera->Position);
 
-		glm::vec3 lightColor = glm::vec3(
-									1.0f,
-									1.0f,
-									1.0f
-								);
+		glm::vec3 lightColor(
+						1.0f,
+						1.0f,
+						1.0f
+		);
 		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
 		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
 
 		glm::vec3 lightPos(
 						glm::sin(currentFrame) * 10,
-						-0.2f,
+						glm::sin(currentFrame) * 10,
 						glm::cos(currentFrame) * 10
-					);
+		);
 
 		objectShader.setVec3("light.position", lightPos); 
 		objectShader.setVec3("light.direction", lightPos);
@@ -560,7 +573,7 @@ int main() {
 						1.0f,
 						1.0f,
 						1.0f
-					);
+		);
 		objectShader.setFloat("material.shininess", 32.0f);
 
 		objectShader.setFloat("light.constant", 1.0f);
@@ -603,6 +616,15 @@ int main() {
 		skybox.draw();
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		framebuffer.useShader();
+		framebuffer.bindScreenQuadVAO();
+		glDisable(GL_DEPTH_TEST);
+		framebuffer.bindTexture();
+		framebuffer.draw();
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);

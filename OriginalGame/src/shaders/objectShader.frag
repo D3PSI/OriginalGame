@@ -3,7 +3,9 @@ out vec4 FragColor;
  
 struct Material {
     sampler2D texture_diffuse1;
-    sampler2D texture_specular1;    
+    sampler2D texture_specular1;   
+	sampler2D texture_normal1;
+	sampler2D texture_height1;
     float shininess;
 }; 
  
@@ -26,7 +28,7 @@ uniform Light light;
  
 void main() {
     // ambient
-    vec3 ambient = light.ambient * texture(material.texture_diffuse1, TexCoords).rgb;
+    vec3 ambient = light.ambient * texture(material.texture_normal1, TexCoords).rgb;
     
     // diffuse 
     vec3 norm = normalize(Normal);

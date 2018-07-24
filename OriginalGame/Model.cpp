@@ -116,7 +116,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	std::vector<Texture> diffuseMaps = loadMaterialTextures(
 		material, 
 		aiTextureType_DIFFUSE, 
-		"texture_diffuse"
+		"material.texture_diffuse"
 	);
 	textures.insert(
 		textures.end(),
@@ -128,7 +128,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	std::vector<Texture> specularMaps = loadMaterialTextures(
 		material, 
 		aiTextureType_SPECULAR, 
-		"texture_specular"
+		"material.texture_specular"
 	);
 	textures.insert(
 		textures.end(), 
@@ -140,7 +140,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	std::vector<Texture> normalMaps = loadMaterialTextures(
 		material, 
 		aiTextureType_AMBIENT, 
-		"texture_normal"
+		"material.texture_normal"
 	);
 	textures.insert(
 		textures.end(),
@@ -152,7 +152,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	std::vector<Texture> heighMaps = loadMaterialTextures(
 		material, 
 		aiTextureType_HEIGHT, 
-		"texture_height"
+		"material.texture_height"
 	);
 	textures.insert(
 		textures.end(), 

@@ -26,15 +26,19 @@ void Mesh::draw(Shader shader) {
 		std::string name = textures[i].type;
 		if (name == "material.texture_diffuse") {
 			number = std::to_string(diffuseNr++);
+			std::cout << name + number << std::endl;
 		}
 		else if (name == "material.texture_specular") {
 			number = std::to_string(specularNr++);
+			std::cout << name + number << std::endl;
 		}
-		else if (name == "texture_normal") {
+		else if (name == "material.texture_normal") {
 			number = std::to_string(normalNr++);
+			std::cout << name + number << std::endl;
 		}
-		else if (name == "texture_height") {
+		else if (name == "material.texture_height") {
 			number = std::to_string(heightNr++);
+			std::cout << name + number << std::endl;
 		}
 		glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].ID);

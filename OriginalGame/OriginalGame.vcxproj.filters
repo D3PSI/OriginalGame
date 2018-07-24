@@ -36,6 +36,9 @@
     <ClCompile Include="Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Framebuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\objectShader.frag" />
@@ -44,6 +47,8 @@
     <None Include="res\models\nanosuit\nanosuit.mtl" />
     <None Include="src\shaders\skyboxShader.frag" />
     <None Include="src\shaders\skyboxShader.vert" />
+    <None Include="src\shaders\screenShader.frag" />
+    <None Include="src\shaders\screenShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\icon\icon.jpg">
@@ -145,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Skybox.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Framebuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
