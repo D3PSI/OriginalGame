@@ -24,8 +24,7 @@ uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
  
-void main()
-{
+void main() {
     // ambient
     vec3 ambient = light.ambient * texture(material.texture_diffuse1, TexCoords).rgb;
     

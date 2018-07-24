@@ -33,12 +33,17 @@
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\objectShader.frag" />
     <None Include="src\shaders\objectShader.vert" />
     <None Include="res\models\nanosuit\nanosuit.blend" />
     <None Include="res\models\nanosuit\nanosuit.mtl" />
+    <None Include="src\shaders\skyboxShader.frag" />
+    <None Include="src\shaders\skyboxShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\icon\icon.jpg">
@@ -98,6 +103,24 @@
     <Image Include="res\models\nanosuit\leg_showroom_spec.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\skybox\back.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\skybox\bottom.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\skybox\front.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\skybox\left.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\skybox\right.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\skybox\top.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="logs\events.log" />
@@ -119,6 +142,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Model.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

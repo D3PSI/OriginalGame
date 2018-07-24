@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define _CRT_SECURE_NO_WARNINGS
 #include "Model.hpp"
+#include "Skybox.hpp"
 #include "Prototypes.hpp"
 
 /*			GLOBAL VARIABLES	*/
@@ -11,11 +12,11 @@ const int SCR_HEIGHT		= 768;
 const char *TITLE			= "Aiming Simulator by D3PSI";
 float lastFrame				= 0.0;
 float deltaTime				= 0.0;
-Camera camera(glm::vec3(
-					0.0f,
-					0.0f,
-					3.0f
-				));
+Camera *camera				= new Camera(glm::vec3(
+												0.0f,
+												0.0f,
+												3.0f
+											));
 glm::vec3 cameraPos			= glm::vec3(
 									0.0f,
 									0.0f, 
@@ -64,16 +65,16 @@ namespace dev {
 			glfwSetWindowShouldClose(window, true);
 
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			camera.ProcessKeyboard(FORWARD, deltaTime);
+			camera->ProcessKeyboard(FORWARD, deltaTime);
 
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			camera.ProcessKeyboard(BACKWARD, deltaTime);
+			camera->ProcessKeyboard(BACKWARD, deltaTime);
 
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			camera.ProcessKeyboard(LEFT, deltaTime);
+			camera->ProcessKeyboard(LEFT, deltaTime);
 
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			camera.ProcessKeyboard(RIGHT, deltaTime);
+			camera->ProcessKeyboard(RIGHT, deltaTime);
 	}
 
 	/*
@@ -101,7 +102,7 @@ namespace dev {
 		lastX = static_cast<float>(xpos);
 		lastY = static_cast<float>(ypos);
 
-		camera.ProcessMouseMovement(xoffset, yoffset);
+		camera->ProcessMouseMovement(xoffset, yoffset);
 	}
 
 	/*
@@ -109,7 +110,7 @@ namespace dev {
 	*
 	*/
 	void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-		camera.ProcessMouseScroll((float)yoffset);
+		camera->ProcessMouseScroll((float)yoffset);
 	}
 
 	/*
@@ -354,6 +355,73 @@ namespace dev {
 	}
 
 	/*
+	*	Loads a cubemap texture from file.
+	*	
+	*/
+	unsigned int loadCubemap(std::vector<std::string> faces) {
+		unsigned int textureID;
+		glGenTextures(1, &textureID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+		int width, height, nrChannels;
+		for (unsigned int i = 0; i < faces.size(); i++) {
+			unsigned char *data = stbi_load(
+										faces[i].c_str(),
+										&width,
+										&height,
+										&nrChannels,
+										0
+									);
+			if (data) {
+				glTexImage2D(
+					GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+					0, 
+					GL_RGB, 
+					width,
+					height,
+					0,
+					GL_RGB, 
+					GL_UNSIGNED_BYTE, 
+					data
+				);
+				stbi_image_free(data);
+			}
+			else {
+				showConsoleWindow();
+				std::cerr << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+				error("Cubemap texture failed to load at path:	" + faces[i] + "\n");
+				stbi_image_free(data);
+			}
+		}
+		glTexParameteri(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_MIN_FILTER,
+			GL_LINEAR
+		);
+		glTexParameteri(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_MAG_FILTER, 
+			GL_LINEAR
+		);
+		glTexParameteri
+		(GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_WRAP_S,
+			GL_CLAMP_TO_EDGE
+		);
+		glTexParameteri(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_WRAP_T,
+			GL_CLAMP_TO_EDGE
+		);
+		glTexParameteri(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_WRAP_R,
+			GL_CLAMP_TO_EDGE
+		);
+		return textureID;
+	}
+
+	/*
 	*	Handles main initialization of GLFW and OpenGL.
 	*
 	*/
@@ -432,8 +500,14 @@ int main() {
 	/*			MODELS				*/
 	Model target("res/models/nanosuit/nanosuit.obj");
 
+	/*			SKYBOX				*/
+	Skybox skybox("res/skybox/");
+
 	/*			OPENGL SETTINGS		*/
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	/*			GAME LOOP			*/	
@@ -456,7 +530,7 @@ int main() {
 		objectShader.use();
 
 		// set uniforms
-		objectShader.setVec3("viewPos", camera.Position);
+		objectShader.setVec3("viewPos", camera->Position);
 
 		glm::vec3 lightColor = glm::vec3(
 			1.0f,
@@ -466,7 +540,7 @@ int main() {
 		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
 		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
 
-		//objectShader.setVec3("light.position", lightPos); 
+		objectShader.setVec3("light.position", lightPos); 
 		objectShader.setVec3("light.direction", lightPos);
 
 		objectShader.setVec3("light.ambient", ambientColor);
@@ -485,13 +559,13 @@ int main() {
 
 		// create view matrix
 		glm::mat4 view;
-		view = camera.GetViewMatrix();
+		view = camera->GetViewMatrix();
 		objectShader.setMat4("view", view);
 
 		// create projection matrix
 		glm::mat4 projection;
 		projection = glm::perspective(
-								glm::radians(camera.Zoom),
+								glm::radians(camera->Zoom),
 								static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 
 								0.1f,
 								100.0f
@@ -511,9 +585,19 @@ int main() {
 		objectShader.setMat4("model", model);
 		target.draw(objectShader);
 
+		glDepthFunc(GL_LEQUAL);
+		skybox.useShader();
+		skybox.setUniforms(camera, SCR_WIDTH, SCR_HEIGHT);
+		skybox.bindVAO();
+		skybox.bindTexture();
+		skybox.draw();
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS);
+
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
+	delete camera;
 
 	// shut everything down
 	glfwTerminate();

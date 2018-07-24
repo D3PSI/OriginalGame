@@ -6,7 +6,7 @@
 */
 Model::Model(std::string const &path, bool gamma) : gammaCorrection(gamma) {
 	loadModel(path);
-	dev::eventLog("Model loaded successfully");
+	dev::eventLog("Model successfully loaded");
 }
 
 /*

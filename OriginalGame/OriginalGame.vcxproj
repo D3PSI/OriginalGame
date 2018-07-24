@@ -128,12 +128,15 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\models\nanosuit\nanosuit.blend" />
     <None Include="res\models\nanosuit\nanosuit.mtl" />
     <None Include="src\shaders\objectShader.frag" />
     <None Include="src\shaders\objectShader.vert" />
+    <None Include="src\shaders\skyboxShader.frag" />
+    <None Include="src\shaders\skyboxShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\icon\icon.jpg" />
@@ -154,6 +157,12 @@
     <Image Include="res\models\nanosuit\leg_dif.png" />
     <Image Include="res\models\nanosuit\leg_showroom_ddn.png" />
     <Image Include="res\models\nanosuit\leg_showroom_spec.png" />
+    <Image Include="res\skybox\back.jpg" />
+    <Image Include="res\skybox\bottom.jpg" />
+    <Image Include="res\skybox\front.jpg" />
+    <Image Include="res\skybox\left.jpg" />
+    <Image Include="res\skybox\right.jpg" />
+    <Image Include="res\skybox\top.jpg" />
     <Image Include="res\textures\test.png" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +177,7 @@
     <ClInclude Include="Model.hpp" />
     <ClInclude Include="Prototypes.hpp" />
     <ClInclude Include="Shader.hpp" />
+    <ClInclude Include="Skybox.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
