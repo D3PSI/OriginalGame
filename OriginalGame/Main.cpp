@@ -36,11 +36,6 @@ bool firstMouse				= true;
 float yaw					= -90.0f; 
 float lastX					= SCR_WIDTH / 2.0f;
 float lastY					= SCR_HEIGHT / 2.0f;
-glm::vec3 lightPos(
-			-0.7f,
-			-0.2f,
-			-2.0f
-		);
 
 /*
 *	Own namespace to prevent any stupid conflicts.
@@ -533,12 +528,18 @@ int main() {
 		objectShader.setVec3("viewPos", camera->Position);
 
 		glm::vec3 lightColor = glm::vec3(
-			1.0f,
-			1.0f,
-			1.0f
-		);
+									1.0f,
+									1.0f,
+									1.0f
+								);
 		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
 		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+		glm::vec3 lightPos(
+						glm::sin(currentFrame) * 10,
+						-0.2f,
+						glm::cos(currentFrame) * 10
+					);
 
 		objectShader.setVec3("light.position", lightPos); 
 		objectShader.setVec3("light.direction", lightPos);
