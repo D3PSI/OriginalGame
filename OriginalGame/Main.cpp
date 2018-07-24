@@ -12,6 +12,7 @@ const int SCR_HEIGHT		= 768;
 const char *TITLE			= "Aiming Simulator by D3PSI";
 float lastFrame				= 0.0;
 float deltaTime				= 0.0;
+bool process				= true;
 Camera *camera				= new Camera(glm::vec3(
 												0.0f,
 												0.0f,
@@ -51,25 +52,30 @@ namespace dev {
 	*
 	*/
 	void processInput(GLFWwindow *window) {
-		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+			process = false;
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE)
+		}
+		else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE) {
+			process = true;
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}
+		if(process) {
+			if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+				glfwSetWindowShouldClose(window, true);
 
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-			glfwSetWindowShouldClose(window, true);
+			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+				camera->ProcessKeyboard(FORWARD, deltaTime);
 
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			camera->ProcessKeyboard(FORWARD, deltaTime);
+			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+				camera->ProcessKeyboard(BACKWARD, deltaTime);
 
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			camera->ProcessKeyboard(BACKWARD, deltaTime);
+			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+				camera->ProcessKeyboard(LEFT, deltaTime);
 
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			camera->ProcessKeyboard(LEFT, deltaTime);
-
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			camera->ProcessKeyboard(RIGHT, deltaTime);
+			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+				camera->ProcessKeyboard(RIGHT, deltaTime);
+		}
 	}
 
 	/*
@@ -85,19 +91,21 @@ namespace dev {
 	*
 	*/
 	void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-		if (firstMouse) {
+		if (process) {
+			if (firstMouse) {
+				lastX = static_cast<float>(xpos);
+				lastY = static_cast<float>(ypos);
+				firstMouse = false;
+			}
+
+			float xoffset = static_cast<float>(xpos) - lastX;
+			float yoffset = lastY - static_cast<float>(ypos); // reversed since y-coordinates go from bottom to top
+
 			lastX = static_cast<float>(xpos);
 			lastY = static_cast<float>(ypos);
-			firstMouse = false;
+
+			camera->ProcessMouseMovement(xoffset, yoffset);
 		}
-
-		float xoffset = static_cast<float>(xpos) - lastX;
-		float yoffset = lastY - static_cast<float>(ypos); // reversed since y-coordinates go from bottom to top
-
-		lastX = static_cast<float>(xpos);
-		lastY = static_cast<float>(ypos);
-
-		camera->ProcessMouseMovement(xoffset, yoffset);
 	}
 
 	/*
@@ -105,7 +113,8 @@ namespace dev {
 	*
 	*/
 	void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-		camera->ProcessMouseScroll((float)yoffset);
+		if(process)
+			camera->ProcessMouseScroll((float)yoffset);
 	}
 
 	/*
@@ -547,11 +556,11 @@ int main() {
 		objectShader.setVec3("light.ambient", ambientColor);
 		objectShader.setVec3("light.diffuse", diffuseColor);
 		objectShader.setVec3(
-			"light.specular",
-			1.0f,
-			1.0f,
-			1.0f
-		);
+						"light.specular",
+						1.0f,
+						1.0f,
+						1.0f
+					);
 		objectShader.setFloat("material.shininess", 32.0f);
 
 		objectShader.setFloat("light.constant", 1.0f);
@@ -574,15 +583,15 @@ int main() {
 		objectShader.setMat4("projection", projection);
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(
-			0.0f,
-		   -1.75f,
-			0.0f
-		));
+											0.0f,
+										   -1.75f,
+											0.0f
+										));
 		model = glm::scale(model, glm::vec3(
-			0.2f, 
-			0.2f,
-			0.2f
-		));  
+										0.2f, 
+										0.2f,
+										0.2f
+									));  
 		objectShader.setMat4("model", model);
 		target.draw(objectShader);
 
