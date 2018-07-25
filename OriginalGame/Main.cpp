@@ -534,7 +534,6 @@ int main() {
 		
 		dev::processInput(window);
 
-		framebuffer.bindFBO();
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		glClearColor(
@@ -544,6 +543,16 @@ int main() {
 			1.0f
 		);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		framebuffer.bindMSAAFBO();
+		glClearColor(
+			0.1f,
+			0.1f,
+			0.1f,
+			1.0f
+		);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 		objectShader.use();
 
 		// set uniforms
@@ -610,12 +619,17 @@ int main() {
 
 		glDepthFunc(GL_LEQUAL);
 		skybox.useShader();
-		skybox.setUniforms(camera, SCR_WIDTH, SCR_HEIGHT);
+		skybox.setUniforms(
+			camera,
+			SCR_WIDTH,
+			SCR_HEIGHT
+		);
 		skybox.bindVAO();
 		skybox.bindTexture();
 		skybox.draw();
 		glBindVertexArray(0);
 
+		framebuffer.blit(SCR_WIDTH, SCR_HEIGHT);
 		framebuffer.draw();
 
 		glfwPollEvents();

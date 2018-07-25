@@ -13,34 +13,24 @@ float quadVertices[] = { // vertex attributes for a quad that fills the entire s
 };
 
 /*
-*	Constructor.
+*	Constructor with arguments.
 *	
 */
 Framebuffer::Framebuffer(const int SCR_WIDTH, const int SCR_HEIGHT, const char *vertPath, const char *fragPath, const char *geomPath) {
-	createFBO(
-		SCR_WIDTH,
-		SCR_HEIGHT,
-		vertPath, 
-		fragPath, 
-		geomPath
-	);
-}
-
-/*
-*	Sets up the buffers and everything.
-*	
-*/
-void Framebuffer::createFBO(const int SCR_WIDTH, const int SCR_HEIGHT, const char *vertPath, const char *fragPath, const char *geomPath) {
+	glGenFramebuffers(1, &fboMSAAID);
+	bindMSAAFBO();
+	createMSAATexture(SCR_WIDTH, SCR_HEIGHT);
+	createMSAARBO(SCR_WIDTH, SCR_HEIGHT);
+	checkFBOStatus();
 	glGenFramebuffers(1, &fboID);
 	bindFBO();
 	createTexture(SCR_WIDTH, SCR_HEIGHT);
-	createRBO(SCR_WIDTH, SCR_HEIGHT);
 	checkFBOStatus();
 	createScreenQuadVAO();
 	createScreenShader(
-				vertPath,
-				fragPath,
-				geomPath
+		vertPath,
+		fragPath,
+		geomPath
 	);
 }
 
@@ -50,6 +40,14 @@ void Framebuffer::createFBO(const int SCR_WIDTH, const int SCR_HEIGHT, const cha
 */
 void Framebuffer::bindFBO() {
 	glBindFramebuffer(GL_FRAMEBUFFER, fboID);
+}
+
+/*
+*	Bind the multisampled framebuffer object.
+*	
+*/
+void Framebuffer::bindMSAAFBO() {
+	glBindFramebuffer(GL_FRAMEBUFFER, fboMSAAID);
 }
 
 /*
@@ -91,11 +89,44 @@ void Framebuffer::createTexture(const int SCR_WIDTH, const int SCR_HEIGHT) {
 }
 
 /*
+*	Creaets the multisampled texture attachment.
+*	
+*/
+void Framebuffer::createMSAATexture(const int SCR_WIDTH, const int SCR_HEIGHT) {
+	glGenTextures(1, &texMSAAID);
+	bindTexture();
+	glTexImage2DMultisample(
+		GL_TEXTURE_2D_MULTISAMPLE,
+		4,
+		GL_RGB,
+		SCR_WIDTH,
+		SCR_HEIGHT,
+		GL_TRUE
+	);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+	glFramebufferTexture2D(
+		GL_FRAMEBUFFER,
+		GL_COLOR_ATTACHMENT0,
+		GL_TEXTURE_2D_MULTISAMPLE,
+		texMSAAID,
+		0
+	);
+}
+
+/*
 *	Binds the texture attachment
 *	
 */
 void Framebuffer::bindTexture() {
 	glBindTexture(GL_TEXTURE_2D, texID);
+}
+
+/*
+*	Binds the multisampled texture attachment
+*
+*/
+void Framebuffer::bindMSAATexture() {
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texMSAAID);
 }
 
 /*
@@ -121,11 +152,42 @@ void Framebuffer::createRBO(const int SCR_WIDTH, const int SCR_HEIGHT) {
 }
 
 /*
+*	Creates the multisampled renderbuffer object.
+*	
+*/
+void Framebuffer::createMSAARBO(const int SCR_WIDTH, const int SCR_HEIGHT) {
+	glGenRenderbuffers(1, &rboMSAAID);
+	bindMSAARBO();
+	glRenderbufferStorageMultisample(
+							GL_RENDERBUFFER,
+							4,
+							GL_DEPTH24_STENCIL8,
+							SCR_WIDTH,
+							SCR_HEIGHT
+	);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(
+							GL_FRAMEBUFFER,
+							GL_DEPTH_STENCIL_ATTACHMENT, 
+							GL_RENDERBUFFER,
+							rboMSAAID
+	);
+}
+
+/*
 *	Binds the renderbuffer object.
 *	
 */
 void Framebuffer::bindRBO() {
 	glBindRenderbuffer(GL_RENDERBUFFER, rboID);
+}
+
+/*
+*	Binds the multisampled renderbuffer object.
+*	
+*/
+void Framebuffer::bindMSAARBO() {
+	glBindRenderbuffer(GL_RENDERBUFFER, rboMSAAID);
 }
 
 /*
@@ -222,6 +284,27 @@ void Framebuffer::draw() {
 	bindScreenQuadVAO();
 	bindTexture();
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+/*
+*	Blits the multisampled buffers to normal colorbuffer of fboID, image is stored in texID.
+*	
+*/
+void Framebuffer::blit(const int SCR_WIDTH, const int SCR_HEIGHT) {
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fboMSAAID);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
+	glBlitFramebuffer(
+		0,
+		0,
+		SCR_WIDTH,
+		SCR_HEIGHT,
+		0,
+		0,
+		SCR_WIDTH,
+		SCR_HEIGHT,
+		GL_COLOR_BUFFER_BIT,
+		GL_NEAREST
+	);
 }
 
 /*
