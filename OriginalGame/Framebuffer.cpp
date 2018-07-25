@@ -94,7 +94,7 @@ void Framebuffer::createTexture(const int SCR_WIDTH, const int SCR_HEIGHT) {
 */
 void Framebuffer::createMSAATexture(const int SCR_WIDTH, const int SCR_HEIGHT) {
 	glGenTextures(1, &texMSAAID);
-	bindTexture();
+	bindMSAATexture();
 	glTexImage2DMultisample(
 		GL_TEXTURE_2D_MULTISAMPLE,
 		4,
