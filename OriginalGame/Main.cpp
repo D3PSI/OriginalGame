@@ -599,6 +599,13 @@ namespace dev {
 		model = glm::scale(model, glm::vec3(0.25));
 		shader.setMat4("model", model);
 		renderCube();
+		glm::mat4 newModel;
+		newModel = glm::translate(newModel, glm::vec3(
+											0.0f, 
+											0.0f,
+											0.0f
+										));
+		shader.setMat4("model", newModel);
 	}
 
 
@@ -815,6 +822,7 @@ int main() {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, woodTexture);
 		dev::renderScene(simpleDepthShader);
+		target.draw(simpleDepthShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(
 			0,
@@ -822,7 +830,16 @@ int main() {
 			SCR_WIDTH,
 			SCR_HEIGHT
 		);
+		framebuffer.bindMSAAFBO();
+		glClearColor(
+			0.1f,
+			0.1f,
+			0.1f,
+			1.0f
+		);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 		objectShader.use();
 		glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera->GetViewMatrix();
@@ -838,6 +855,28 @@ int main() {
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
 		dev::renderScene(objectShader);
+		glm::mat4 model;
+		model = glm::translate(model, glm::vec3(
+											0.0f,
+											0.0f, 
+											0.0f
+										));
+		objectShader.setMat4("model", model);
+		target.draw(objectShader);
+		glDepthFunc(GL_LEQUAL);
+		skybox.useShader();
+		skybox.setUniforms(
+			camera,
+			SCR_WIDTH,
+			SCR_HEIGHT
+		);
+		skybox.bindVAO();
+		skybox.bindTexture();
+		skybox.draw();
+		glBindVertexArray(0);
+
+		framebuffer.blit(SCR_WIDTH, SCR_HEIGHT);
+		framebuffer.draw();
 
 		debugDepthQuad.use();
 		debugDepthQuad.setFloat("near_plane", near_plane);
