@@ -49,6 +49,10 @@
     <None Include="src\shaders\skyboxShader.vert" />
     <None Include="src\shaders\screenShader.frag" />
     <None Include="src\shaders\screenShader.vert" />
+    <None Include="src\shaders\simpleDepthShader.vert" />
+    <None Include="src\shaders\simpleDepthShader.frag" />
+    <None Include="src\shaders\debugDepthQuad.vert" />
+    <None Include="src\shaders\debugDepthQuad.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\icon\icon.jpg">

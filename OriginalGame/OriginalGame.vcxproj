@@ -134,10 +134,14 @@
   <ItemGroup>
     <None Include="res\models\nanosuit\nanosuit.blend" />
     <None Include="res\models\nanosuit\nanosuit.mtl" />
+    <None Include="src\shaders\debugDepthQuad.frag" />
+    <None Include="src\shaders\debugDepthQuad.vert" />
     <None Include="src\shaders\objectShader.frag" />
     <None Include="src\shaders\objectShader.vert" />
     <None Include="src\shaders\screenShader.frag" />
     <None Include="src\shaders\screenShader.vert" />
+    <None Include="src\shaders\simpleDepthShader.frag" />
+    <None Include="src\shaders\simpleDepthShader.vert" />
     <None Include="src\shaders\skyboxShader.frag" />
     <None Include="src\shaders\skyboxShader.vert" />
   </ItemGroup>
