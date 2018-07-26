@@ -1,5 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define _CRT_SECURE_NO_WARNINGS
+#include <glad/glad.c>
 #include "Model.hpp"
 #include "Skybox.hpp"
 #include "Framebuffer.hpp"
