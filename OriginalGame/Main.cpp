@@ -56,6 +56,7 @@ glm::vec3 lightPos(
 			4.0f,
 		   -1.0f
 );
+int printFPS				= 0;
 
 /*
 *	Own namespace to prevent any stupid conflicts.
@@ -834,7 +835,7 @@ int main() {
 	FT_Face face;
 	if (FT_New_Face(
 			ft,
-			"res/fonts/arial.ttf",
+			"res/fonts/forte/forte.ttf",
 			0,
 			&face
 		)) {
@@ -932,9 +933,12 @@ int main() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	int counter = 0;
+
 	/*			GAME LOOP			*/	
 	while (!glfwWindowShouldClose(window)) {
 		// Per-frame time logic
+		counter++;
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -1051,16 +1055,19 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, depthMap);
 		//renderQuad();
 
+		if (counter % 10 == 0) {
+			printFPS = static_cast<int>(fps);
+		}
 		glfwPollEvents();
 		dev::RenderText(
 			glyphShader,
-			"FPS:" + std::to_string(fps),
+			"FPS:" + std::to_string(printFPS),
 			25.0f,
-			25.0f, 
+			25.0f,
 			1.0f,
 			glm::vec3(
 				1.0f,
-				1.0f, 
+				1.0f,
 				1.0f
 			)
 		);
