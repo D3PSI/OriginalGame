@@ -1054,14 +1054,14 @@ int main() {
 		glfwPollEvents();
 		dev::RenderText(
 			glyphShader,
-			std::to_string(fps),
+			"FPS:" + std::to_string(fps),
 			25.0f,
 			25.0f, 
 			1.0f,
 			glm::vec3(
-				0.5,
-				0.8f, 
-				0.2f
+				1.0f,
+				1.0f, 
+				1.0f
 			)
 		);
 		glfwSwapBuffers(window);
