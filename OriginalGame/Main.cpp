@@ -1,5 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define _CRT_SECURE_NO_WARNINGS
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include <glad/glad.c>
 #include "Model.hpp"
 #include "Skybox.hpp"
@@ -7,6 +9,15 @@
 #include "Prototypes.hpp"
 
 /*			GLOBAL VARIABLES	*/
+struct Character {
+	GLuint     TextureID;  // ID handle of the glyph texture
+	glm::ivec2 Size;       // Size of glyph
+	glm::ivec2 Bearing;    // Offset from baseline to left/top of glyph
+	GLuint     Advance;    // Offset to advance to next glyph
+};
+
+std::map<GLchar, Character> Characters;
+GLuint VAO, VBO;
 HWND consoleWindow			= GetConsoleWindow();
 GLFWwindow *window			= nullptr;
 const int SCR_WIDTH			= 1280;
@@ -609,6 +620,55 @@ namespace dev {
 		shader.setMat4("model", newModel);
 	}
 
+	/*
+	*	Renders a string of text to the screen.
+	*	
+	*/
+	void RenderText(Shader &s, std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color) {
+		// Activate corresponding render state	
+		s.use();
+		glUniform3f(glGetUniformLocation(s.ID, "textColor"), color.x, color.y, color.z);
+		glActiveTexture(GL_TEXTURE0);
+		glBindVertexArray(VAO);
+
+		// Iterate through all characters
+		std::string::const_iterator c;
+		for (c = text.begin(); c != text.end(); c++) {
+			Character ch = Characters[*c];
+
+			GLfloat xpos = x + ch.Bearing.x * scale;
+			GLfloat ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+			GLfloat w = ch.Size.x * scale;
+			GLfloat h = ch.Size.y * scale;
+			// Update VBO for each character
+			GLfloat vertices[6][4] = {
+			{ xpos,     ypos + h,   0.0, 0.0 },
+			{ xpos,     ypos,       0.0, 1.0 },
+			{ xpos + w, ypos,       1.0, 1.0 },
+
+			{ xpos,     ypos + h,   0.0, 0.0 },
+			{ xpos + w, ypos,       1.0, 1.0 },
+			{ xpos + w, ypos + h,   1.0, 0.0 }
+			};
+
+			// Render glyph texture over quad
+			glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+
+			// Update content of VBO memory
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			// Render quad
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+
+			// Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+			x += (ch.Advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
+		}
+		glBindVertexArray(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 
 	/*
 	*	Handles main initialization of GLFW and OpenGL.
@@ -746,6 +806,7 @@ int main() {
 	Shader objectShader("src/shaders/objectShader.vert", "src/shaders/objectShader.frag");
 	Shader simpleDepthShader("src/shaders/simpleDepthShader.vert", "src/shaders/simpleDepthShader.frag");
 	Shader debugDepthQuad("src/shaders/debugDepthQuad.vert", "src/shaders/debugDepthQuad.frag");
+	Shader glyphShader("src/shaders/glyph.vert", "src/shaders/glyph.frag");
 
 	objectShader.use();
 	objectShader.setInt("diffuseTexture", 0);
@@ -753,6 +814,108 @@ int main() {
 
 	debugDepthQuad.use();
 	debugDepthQuad.setInt("depthMap", 0);
+	glm::mat4 glyphProjection = glm::ortho(
+		0.0f,
+		static_cast<GLfloat>(SCR_WIDTH),
+		0.0f,
+		static_cast<GLfloat>(SCR_HEIGHT)
+	);
+	glyphShader.use();
+	glyphShader.setMat4("projection", glyphProjection);
+
+	/*			FONTS				*/
+	FT_Library ft;
+	if (FT_Init_FreeType(&ft)) {
+		dev::showConsoleWindow();
+		std::cerr << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		dev::error("ERROR::FREETYPE: Could not init FreeType Library");
+	}
+
+	FT_Face face;
+	if (FT_New_Face(
+			ft,
+			"res/fonts/arial.ttf",
+			0,
+			&face
+		)) {
+		dev::showConsoleWindow();
+		std::cerr << "ERROR::FREETYPE: Failed to load font" << std::endl;
+		dev::error("ERROR::FREETYPE: Failed to load font");
+	}
+	FT_Set_Pixel_Sizes(
+		face,
+		0,
+		48
+	);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	for (GLubyte c = 0; c < 128; c++) {
+		// Load character glyph 
+		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+			dev::showConsoleWindow();
+			std::cerr << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+			dev::error("ERROR::FREETYTPE: Failed to load Glyph");
+			continue;
+		}
+
+		// Generate texture
+		GLuint texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GL_RED,
+			face->glyph->bitmap.width,
+			face->glyph->bitmap.rows,
+			0,
+			GL_RED,
+			GL_UNSIGNED_BYTE,
+			face->glyph->bitmap.buffer
+		);
+
+		// Set texture options
+		glTexParameteri(
+			GL_TEXTURE_2D,
+			GL_TEXTURE_WRAP_S,
+			GL_CLAMP_TO_EDGE
+		);
+		glTexParameteri(
+			GL_TEXTURE_2D, 
+			GL_TEXTURE_WRAP_T,
+			GL_CLAMP_TO_EDGE
+		);
+		glTexParameteri(
+			GL_TEXTURE_2D,
+			GL_TEXTURE_MIN_FILTER,
+			GL_LINEAR
+		);
+		glTexParameteri(
+			GL_TEXTURE_2D, 
+			GL_TEXTURE_MAG_FILTER, 
+			GL_LINEAR
+		);
+
+		// Now store character for later use
+		Character character = {
+			texture,
+			glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+			face->glyph->advance.x
+		};
+		Characters.insert(std::pair<GLchar, Character>(c, character));
+	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	/*			MODELS				*/
 	Model target("res/models/nanosuit/nanosuit.obj");
@@ -765,6 +928,8 @@ int main() {
 	/*			OPENGL SETTINGS		*/
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	/*			GAME LOOP			*/	
@@ -773,7 +938,7 @@ int main() {
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		//double fps = 1 / deltaTime;
+		float fps = 1 / deltaTime;
 		//std::cout << fps << std::endl;
 		
 		dev::processInput(window);
@@ -842,7 +1007,7 @@ int main() {
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		objectShader.use();
-		glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
 		glm::mat4 view = camera->GetViewMatrix();
 		objectShader.setMat4("projection", projection);
 		objectShader.setMat4("view", view);
@@ -887,6 +1052,18 @@ int main() {
 		//renderQuad();
 
 		glfwPollEvents();
+		dev::RenderText(
+			glyphShader,
+			std::to_string(fps),
+			25.0f,
+			25.0f, 
+			1.0f,
+			glm::vec3(
+				0.5,
+				0.8f, 
+				0.2f
+			)
+		);
 		glfwSwapBuffers(window);
 	}
 	delete camera;

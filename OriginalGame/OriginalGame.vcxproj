@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -77,11 +77,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../External Resources/OpenAL/include;$(SolutionDir)/../External Resources/GLFW/include;$(SolutionDir)/../External Resources/stbimage/include;$(SolutionDir)/../External Resources/glm;$(SolutionDir)/../External Resources/assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../External Resources/OpenAL/include;$(SolutionDir)/../External Resources/GLFW/include;$(SolutionDir)/../External Resources/stbimage/include;$(SolutionDir)/../External Resources/glm;$(SolutionDir)/../External Resources/freetype/include;$(SolutionDir)/../External Resources/assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)/../External Resources/GLFW/lib-vc2015;$(SolutionDir)/../External Resources/assimp/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../External Resources/GLFW/lib-vc2015;$(SolutionDir)/../External Resources/freetype/lib;$(SolutionDir)/../External Resources/assimp/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;assimp-vc140-mt.lib;freetyped.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -124,6 +124,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
+    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -135,6 +136,8 @@
     <None Include="res\models\nanosuit\nanosuit.mtl" />
     <None Include="src\shaders\debugDepthQuad.frag" />
     <None Include="src\shaders\debugDepthQuad.vert" />
+    <None Include="src\shaders\glyph.frag" />
+    <None Include="src\shaders\glyph.vert" />
     <None Include="src\shaders\objectShader.frag" />
     <None Include="src\shaders\objectShader.vert" />
     <None Include="src\shaders\screenShader.frag" />
@@ -180,6 +183,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="Framebuffer.hpp" />
+    <ClInclude Include="HUD.hpp" />
     <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="Model.hpp" />
     <ClInclude Include="Prototypes.hpp" />

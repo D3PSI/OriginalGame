@@ -36,6 +36,9 @@
     <ClCompile Include="Framebuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HUD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\objectShader.frag" />
@@ -50,6 +53,8 @@
     <None Include="src\shaders\simpleDepthShader.frag" />
     <None Include="src\shaders\debugDepthQuad.vert" />
     <None Include="src\shaders\debugDepthQuad.frag" />
+    <None Include="src\shaders\glyph.vert" />
+    <None Include="src\shaders\glyph.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\icon\icon.jpg">
@@ -154,6 +159,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Framebuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HUD.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
